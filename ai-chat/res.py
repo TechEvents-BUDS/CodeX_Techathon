@@ -121,12 +121,13 @@ def chat():
                 evaluation = entry.get("evaluation", "N/A")
                 guidance = entry.get("guidance", "N/A")
 
-                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\nGuidance: {guidance}\n\n"
+                conversation_history += f"Evaluation: {evaluation}\nGuidance: {guidance}\n\n"
 
-            guidance_prompt = (
+            guidance_prompt = ( 
                 f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
                 "Offer recommendations on what skills to focus on, next steps in their career, and resources they can use. "
                 "Consider the following conversation history for context:\n"
+                f"Counsel {user_message} with great consideration."
                 f"{conversation_history}"
             )
             response = model.generate_content(guidance_prompt)
