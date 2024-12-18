@@ -137,8 +137,8 @@ def chat():
             response = model.generate_content(guidance_prompt)
             guidance = response.text
 
-            completeguidance
-            user["history"].append({"guidance": guidance})
+            completeguidance+=guidance
+            user["history"].append({"guidance": completeguidance})
 
             if user_message.lower() == "/exit":
                 user_sessions[user_id] = DEFAULT_STATE.copy()
