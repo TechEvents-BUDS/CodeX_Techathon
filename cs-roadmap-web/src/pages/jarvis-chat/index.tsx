@@ -7,12 +7,12 @@ const ChatIndexPage = () => {
 export default ChatIndexPage;
 
 export const getServerSideProps = () => {
-  const uuid = "123";
+  const uuid = Math.random().toString(36).substring(7);
 
   return {
     redirect: {
-      destination: `/chat/${uuid}`,
-      permanent: true,
+      destination: `/jarvis-chat/${uuid}`,
+      permanent: false,
     },
   };
 };
