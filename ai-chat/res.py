@@ -99,7 +99,7 @@ def chat():
             evaluation_prompt = (
                 f"Evaluate the following answer to the question in the role of a software career counselor, "
                 f"providing teaching and a reality check, and guide the user accordingly:\n"
-                f"Question: {last_question}\nAnswer: {user_answer}"
+                f"This was the you asked : Question: {last_question}\nThis is the answer you gave and evaluate this Answer: {user_answer}"
             )
 
             response = model.generate_content(evaluation_prompt)
