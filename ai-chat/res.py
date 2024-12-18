@@ -115,6 +115,7 @@ def chat():
             goal = user["goal"].lower()
             experience = user["experience"].lower()
 
+            conversation_history=""
             for entry in user["history"]:
                 goal = entry.get("goal", "N/A")
                 experience = entry.get("experience", "N/A")
