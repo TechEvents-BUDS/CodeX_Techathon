@@ -23,14 +23,13 @@ system_prompt = (
     "You can assist the user in web, containerization, cloud-computing, AI and its sub-domains, and other related technological and non-programming fields. "
     "You can motivate the user towards the role they want to specialize in as well, but remember it should be domain-specific(computer science). "
     "You should keep the conversation friendly."
+    "You should tell the user should If the user response is repeating and does not provide any insight."
 )
-
 model = genai.GenerativeModel(
     "gemini-1.5-flash",
     generation_config={"temperature": 0.5},
     system_instruction=system_prompt
 )
-
 DEFAULT_STATE = {
     "state": "start",
     "goal": None,
@@ -38,7 +37,6 @@ DEFAULT_STATE = {
     "history": [],
     "completeguidance": ""  
 }
-
 user_sessions = {}
 
 @app.route('/chat', methods=['POST'])
@@ -131,14 +129,9 @@ def chat():
                 "Consider the following conversation history for context:\n"
                 f"{conversation_history}"
             )
-
             response = model.generate_content(guidance_prompt)
             guidance = response.text
-
-            user["completeguidance"] += guidance
-
-            user["history"].append({"guidance": user["completeguidance"]})
-
+            user["history"].append({"guidance":guidance})
             if user_message.lower() == "/exit":
                 user_sessions[user_id] = DEFAULT_STATE.copy()
 
