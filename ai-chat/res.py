@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from flask_talisman import Talisman
 import uuid
 import os
 from flask_cors import CORS
@@ -7,7 +6,6 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 CORS(app)  
-Talisman(app)
 
 api_key = os.getenv("GENAI_API_KEY")
 if not api_key:
@@ -120,19 +118,21 @@ def chat():
                 question = entry.get("question", "N/A")
                 answer = entry.get("answer", "N/A")
                 evaluation = entry.get("evaluation", "N/A")
+                guidance= entry.get("guidance","N/A")
 
-                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\n\n"
-
+                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation} Guidance:{guidance}\n\n"
+            
             guidance_prompt = (
-                f"Provide career guidance to a '{experience}' level '{goal}'. "
+                f"Only provide career guidance to a '{experience}' level '{goal}' with {message}. "
                 "Offer recommendations on what skills to focus on, next steps in their career, and resources they can use. "
                 "Consider the following conversation history for context:\n"
                 f"{conversation_history}"
-                "Keep on talking to the user after guidance regarding their interests in the domain their goals."
             )
 
             response = model.generate_content(guidance_prompt)
             guidance = response.text
+
+            user["history"].append({"guidance": guidance})
 
             if user_message.lower() == "/exit":
                 user_sessions[user_id] = DEFAULT_STATE.copy()
@@ -146,4 +146,4 @@ def chat():
         return jsonify({"error": str(e), "user_id": user_id}), 500
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run("127.0.0.1",port=5000, debug=False)
