@@ -50,6 +50,7 @@ const ChatPage = ({ uuid }: Props) => {
         uuid,
       })
     );
+    scrollToEnd();
   }, [chats]);
 
   const scrollToEnd = () => {
@@ -81,7 +82,6 @@ const ChatPage = ({ uuid }: Props) => {
         by: "user",
       },
     ]);
-    scrollToEnd();
 
     // hit the api
 
@@ -97,7 +97,6 @@ const ChatPage = ({ uuid }: Props) => {
             },
           ]);
           setMessage("");
-          scrollToEnd();
           return;
         }
 
@@ -112,7 +111,7 @@ const ChatPage = ({ uuid }: Props) => {
   const router = useRouter();
 
   return (
-    <div className="flex w-screen h-screen">
+    <div className="flex w-screen h-screen overflow-hidden">
       <div className="h-full hidden md:flex flex-col  md:w-56 lg:w-72 bg-sidebar p-4 py-6">
         <Link href={"/"}>
           <div className="flex h-fit gap-2 items-center">
@@ -139,7 +138,9 @@ const ChatPage = ({ uuid }: Props) => {
           <div
             className="text-white  hover:text-primary  cursor-pointer"
             onClick={() => {
-              router.push(`/jarvis-chat/${Math.random().toString(36).substring(7)}`);
+              router.push(`/jarvis-chat/${Math.random().toString(36).substring(7)}`).then(() => {
+                router.reload();
+              });
             }}
           >
             New Chat

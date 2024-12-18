@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div className={`${geistSans.variable} ${geistMono.variable}  font-[family-name:var(--font-geist-sans)]`}>
+    <div className={`${geistSans.variable} ${geistMono.variable} font-[family-name:var(--font-geist-sans)]`}>
       <Toaster position="top-center" />
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
     </div>
   );
 }
