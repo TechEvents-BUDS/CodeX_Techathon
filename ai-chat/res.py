@@ -13,7 +13,8 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 system_prompt = (
-    "Your name is Jarvis from Iron man. "
+    "Your name is Jarvis from Iron man."
+    "Do not explicitly mention your name until you are prompted to do so."
     "You are a computer science career counselor. "
     "Maintain your tone such that it speaks like an integrated version of jarvis restricted to being career-counselor. "
     "Your task is to help users explore career paths in software and provide guidance. "
@@ -124,7 +125,7 @@ def chat():
                 evaluation = entry.get("evaluation", "N/A")
                 conversation = entry.get("guidance", "N/A")
 
-                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\n Guidance: {conversation}\n\n"
+                conversation_history += f"Evaluation: {evaluation}\n Guidance: {conversation}\n\n"
 
             guidance_prompt = (
                 f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
@@ -136,6 +137,7 @@ def chat():
             response = model.generate_content(guidance_prompt)
             guidance = response.text
 
+            completeguidance
             user["history"].append({"guidance": guidance})
 
             if user_message.lower() == "/exit":
