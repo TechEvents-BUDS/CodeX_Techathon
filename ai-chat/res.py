@@ -112,6 +112,7 @@ def chat():
         elif user["state"] == "guidance":
             goal = user["goal"].lower()
             experience = user["experience"].lower()
+            message=user_message
 
             conversation_history = ""
             for entry in user["history"]:
