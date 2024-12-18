@@ -13,14 +13,15 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 system_prompt = (
-    "Your name is Jarvis from Iron man."
-    "You are a computer science career counselor. Maintain your tone such that it speaks like an integrated version of jarvis restricted to being career-counselor. Your task is to help users explore career paths in software and provide guidance. "
-    "You should ignore responses that do not make much sense."
-    "You should turn down politely if user asks for counseling other than areas that come under computer science domain or technology domain."
-    "You can assist the user in web, containerization, cloud-computing, AI and its sub-domains, and other related technological and non-programming fields."
-    "You can motivate the user towards the role they want to specialize in as well, but remember it should be domain-specific(computer science)."
+    "Your name is Jarvis from Iron man. "
+    "You are a computer science career counselor. "
+    "Maintain your tone such that it speaks like an integrated version of jarvis restricted to being career-counselor. "
+    "Your task is to help users explore career paths in software and provide guidance. "
+    "You should ignore responses that do not make much sense. "
+    "You should turn down politely if user asks for counseling other than areas that come under computer science domain or technology domain. "
+    "You can assist the user in web, containerization, cloud-computing, AI and its sub-domains, and other related technological and non-programming fields. "
+    "You can motivate the user towards the role they want to specialize in as well, but remember it should be domain-specific(computer science). "
     "You should keep the conversation friendly."
-
 )
 model = genai.GenerativeModel(
     "gemini-1.5-flash",
@@ -37,6 +38,7 @@ DEFAULT_STATE = {
 
 user_sessions = {}
 
+conversation_history = ""
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -113,17 +115,7 @@ def chat():
             goal = user["goal"].lower()
             experience = user["experience"].lower()
 
-            conversation_history = ""
-            for entry in user["history"]:
-                goal = entry.get("goal", "N/A")
-                experience = entry.get("experience", "N/A")
-                question = entry.get("question", "N/A")
-                answer = entry.get("answer", "N/A")
-                evaluation = entry.get("evaluation", "N/A")
-                conversation = entry.get("guidance", "N/A")
-
-                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\n Guidance: {conversation}\n\n"
-
+           
             guidance_prompt = (
                 f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
                 "Offer recommendations on what skills to focus on, next steps in their career, and resources they can use. "
@@ -135,6 +127,16 @@ def chat():
             guidance = response.text
 
             user["history"].append({"guidance": guidance})
+
+             for entry in user["history"]:
+                goal = entry.get("goal", "N/A")
+                experience = entry.get("experience", "N/A")
+                question = entry.get("question", "N/A")
+                answer = entry.get("answer", "N/A")
+                evaluation = entry.get("evaluation", "N/A")
+                conversation = entry.get("guidance", "N/A")
+
+                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\n Guidance: {conversation}\n\n"
 
             if user_message.lower() == "/exit":
                 user_sessions[user_id] = DEFAULT_STATE.copy()
