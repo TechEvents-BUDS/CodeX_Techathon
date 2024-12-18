@@ -112,7 +112,6 @@ def chat():
         elif user["state"] == "guidance":
             goal = user["goal"].lower()
             experience = user["experience"].lower()
-            message=user_message
 
             conversation_history = ""
             for entry in user["history"]:
@@ -126,7 +125,7 @@ def chat():
                 conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\n Guidance: {conversation}\n\n"
 
             guidance_prompt = (
-                f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {message}. "
+                f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
                 "Offer recommendations on what skills to focus on, next steps in their career, and resources they can use. "
                 "Consider the following conversation history for context:\n"
                 f"{conversation_history}"
