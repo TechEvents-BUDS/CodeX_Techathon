@@ -5,7 +5,7 @@ from flask_cors import CORS
 import google.generativeai as genai
 
 app = Flask(__name__)
-CORS(app)  
+CORS(app)
 
 api_key = os.getenv("GENAI_API_KEY")
 if not api_key:
@@ -13,14 +13,18 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 system_prompt = (
-    "You are a computer science career counselor. Your task is to help users explore career paths in software and provide guidance. "
-    "You should ignore responses that do not make much sense."
-    "You should turn down politely if user asks for counseling other than areas that come under computer science domain or technology domain."
-    "You can assist the user in web, containerization, cloud-computing, AI and its sub-domains, and other related technological and non-programming fields."
-    "You can motivate the user towards the role they want to specialize in as well, but remember it should be domain-specific(computer science)."
+    "Your name is Jarvis from Iron man. "
+    "Do not explicitly mention your name until you are prompted to do so. "
+    "You are a computer science career counselor. "
+    "Maintain your tone such that it speaks like an integrated version of jarvis restricted to being career-counselor. "
+    "Your task is to help users explore career paths in software and provide guidance. "
+    "You should ignore responses that do not make much sense. "
+    "You should turn down politely if user asks for counseling other than areas that come under computer science domain or technology domain. "
+    "You can assist the user in web, containerization, cloud-computing, AI and its sub-domains, and other related technological and non-programming fields. "
+    "You can motivate the user towards the role they want to specialize in as well, but remember it should be domain-specific(computer science). "
     "You should keep the conversation friendly."
-    
 )
+
 model = genai.GenerativeModel(
     "gemini-1.5-flash",
     generation_config={"temperature": 0.5},
@@ -31,7 +35,8 @@ DEFAULT_STATE = {
     "state": "start",
     "goal": None,
     "experience": None,
-    "history": []
+    "history": [],
+    "completeguidance": ""  
 }
 
 user_sessions = {}
@@ -113,17 +118,15 @@ def chat():
 
             conversation_history = ""
             for entry in user["history"]:
-                goal = entry.get("goal", "N/A")
-                experience = entry.get("experience", "N/A")
                 question = entry.get("question", "N/A")
                 answer = entry.get("answer", "N/A")
                 evaluation = entry.get("evaluation", "N/A")
-                guidance= entry.get("guidance","N/A")
+                guidance = entry.get("guidance", "N/A")
 
-                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation} Guidance:{guidance}\n\n"
-            
+                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\nGuidance: {guidance}\n\n"
+
             guidance_prompt = (
-                f"Only provide career guidance to a '{experience}' level '{goal}' with {message}. "
+                f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
                 "Offer recommendations on what skills to focus on, next steps in their career, and resources they can use. "
                 "Consider the following conversation history for context:\n"
                 f"{conversation_history}"
@@ -132,7 +135,9 @@ def chat():
             response = model.generate_content(guidance_prompt)
             guidance = response.text
 
-            user["history"].append({"guidance": guidance})
+            user["completeguidance"] += guidance
+
+            user["history"].append({"guidance": user["completeguidance"]})
 
             if user_message.lower() == "/exit":
                 user_sessions[user_id] = DEFAULT_STATE.copy()
@@ -145,5 +150,6 @@ def chat():
     except Exception as e:
         return jsonify({"error": str(e), "user_id": user_id}), 500
 
+
 if __name__ == '__main__':
-    app.run("127.0.0.1",port=5000, debug=False)
+    app.run("127.0.0.1", port=5000)
