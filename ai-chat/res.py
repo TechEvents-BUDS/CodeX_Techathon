@@ -7,6 +7,7 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app)
 
+
 api_key = os.getenv("GENAI_API_KEY")
 if not api_key:
     raise ValueError("GENAI_API_KEY env not set")
@@ -38,7 +39,7 @@ DEFAULT_STATE = {
 }
 
 user_sessions = {}
-
+completeguidance=''
 conversation_history = ""
 
 @app.route('/chat', methods=['POST'])
@@ -115,7 +116,6 @@ def chat():
         elif user["state"] == "guidance":
             goal = user["goal"].lower()
             experience = user["experience"].lower()
-
             conversation_history=""
             for entry in user["history"]:
                 goal = entry.get("goal", "N/A")
@@ -123,9 +123,9 @@ def chat():
                 question = entry.get("question", "N/A")
                 answer = entry.get("answer", "N/A")
                 evaluation = entry.get("evaluation", "N/A")
-                conversation = entry.get("guidance", "N/A")
+                guidance = entry.get("guidance", "N/A")
 
-                conversation_history += f"Evaluation: {evaluation}\n Guidance: {conversation}\n\n"
+                conversation_history += f"evaluation: {evaluation}\n guidance: {guidance}\n\n"
 
             guidance_prompt = (
                 f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
