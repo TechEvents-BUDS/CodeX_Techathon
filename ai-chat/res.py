@@ -7,15 +7,14 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app)
 
-
 api_key = os.getenv("GENAI_API_KEY")
 if not api_key:
     raise ValueError("GENAI_API_KEY env not set")
 genai.configure(api_key=api_key)
 
 system_prompt = (
-    "Your name is Jarvis from Iron man."
-    "Do not explicitly mention your name until you are prompted to do so."
+    "Your name is Jarvis from Iron man. "
+    "Do not explicitly mention your name until you are prompted to do so. "
     "You are a computer science career counselor. "
     "Maintain your tone such that it speaks like an integrated version of jarvis restricted to being career-counselor. "
     "Your task is to help users explore career paths in software and provide guidance. "
@@ -25,6 +24,7 @@ system_prompt = (
     "You can motivate the user towards the role they want to specialize in as well, but remember it should be domain-specific(computer science). "
     "You should keep the conversation friendly."
 )
+
 model = genai.GenerativeModel(
     "gemini-1.5-flash",
     generation_config={"temperature": 0.5},
@@ -35,12 +35,11 @@ DEFAULT_STATE = {
     "state": "start",
     "goal": None,
     "experience": None,
-    "history": []
+    "history": [],
+    "completeguidance": ""  
 }
 
 user_sessions = {}
-completeguidance=''
-conversation_history = ""
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -116,16 +115,15 @@ def chat():
         elif user["state"] == "guidance":
             goal = user["goal"].lower()
             experience = user["experience"].lower()
-            conversation_history=""
+
+            conversation_history = ""
             for entry in user["history"]:
-                goal = entry.get("goal", "N/A")
-                experience = entry.get("experience", "N/A")
                 question = entry.get("question", "N/A")
                 answer = entry.get("answer", "N/A")
                 evaluation = entry.get("evaluation", "N/A")
                 guidance = entry.get("guidance", "N/A")
 
-                conversation_history += f"evaluation: {evaluation}\n guidance: {guidance}\n\n"
+                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\nGuidance: {guidance}\n\n"
 
             guidance_prompt = (
                 f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
@@ -137,8 +135,9 @@ def chat():
             response = model.generate_content(guidance_prompt)
             guidance = response.text
 
-            completeguidance+=guidance
-            user["history"].append({"guidance": completeguidance})
+            user["completeguidance"] += guidance
+
+            user["history"].append({"guidance": user["completeguidance"]})
 
             if user_message.lower() == "/exit":
                 user_sessions[user_id] = DEFAULT_STATE.copy()
@@ -153,4 +152,4 @@ def chat():
 
 
 if __name__ == '__main__':
-    app.run("127.0.0.1",port=5000)
+    app.run("127.0.0.1", port=5000)
