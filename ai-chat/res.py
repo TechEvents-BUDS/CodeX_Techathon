@@ -5,7 +5,7 @@ from flask_cors import CORS
 import google.generativeai as genai
 
 app = Flask(__name__)
-CORS(app)  
+CORS(app)
 
 api_key = os.getenv("GENAI_API_KEY")
 if not api_key:
@@ -13,13 +13,14 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 system_prompt = (
+    "Your name is Jarvis. "
     "You are a computer science career counselor. Your task is to help users explore career paths in software and provide guidance. "
     "You should ignore responses that do not make much sense."
     "You should turn down politely if user asks for counseling other than areas that come under computer science domain or technology domain."
     "You can assist the user in web, containerization, cloud-computing, AI and its sub-domains, and other related technological and non-programming fields."
     "You can motivate the user towards the role they want to specialize in as well, but remember it should be domain-specific(computer science)."
     "You should keep the conversation friendly."
-    
+
 )
 model = genai.GenerativeModel(
     "gemini-1.5-flash",
@@ -35,6 +36,7 @@ DEFAULT_STATE = {
 }
 
 user_sessions = {}
+
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -118,12 +120,12 @@ def chat():
                 question = entry.get("question", "N/A")
                 answer = entry.get("answer", "N/A")
                 evaluation = entry.get("evaluation", "N/A")
-                guidance= entry.get("guidance","N/A")
+                conversation = entry.get("guidance", "N/A")
 
-                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation} Guidance:{guidance}\n\n"
-            
+                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\n Guidance: {conversation}\n\n"
+
             guidance_prompt = (
-                f"Only provide career guidance to a '{experience}' level '{goal}' with {message}. "
+                f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {message}. "
                 "Offer recommendations on what skills to focus on, next steps in their career, and resources they can use. "
                 "Consider the following conversation history for context:\n"
                 f"{conversation_history}"
@@ -145,5 +147,6 @@ def chat():
     except Exception as e:
         return jsonify({"error": str(e), "user_id": user_id}), 500
 
+
 if __name__ == '__main__':
-    app.run("127.0.0.1",port=5000, debug=False)
+    app.run("127.0.0.1",port=5000)
