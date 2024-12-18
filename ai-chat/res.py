@@ -125,9 +125,9 @@ def chat():
 
             guidance_prompt = ( 
                 f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
-                "Offer recommendations on what skills to focus on, next steps in their career, and resources they can use. "
-                "Consider the following conversation history for context:\n"
+                "Offer recommendations on what skills to focus on, next steps in their career, and courses/resources they can use. "
                 f"Counsel {user_message} with great consideration."
+                "Consider the following conversation history for context:\n"
                 f"{conversation_history}"
             )
             response = model.generate_content(guidance_prompt)
