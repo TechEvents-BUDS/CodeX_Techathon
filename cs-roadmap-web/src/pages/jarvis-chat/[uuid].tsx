@@ -1,10 +1,12 @@
 import Loader from "@/components/global/Loader";
 import { cookies_keys } from "@/constants";
 import api, { endPoints } from "@/utils/api";
-import { clientCookieManager, serverCookieManager } from "@/utils/cookie-manager";
+import { clientCookieManager } from "@/utils/cookie-manager";
 import notify from "@/utils/notify";
 import classNames from "classnames";
 import { NextPageContext } from "next";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { FaRobot, FaUser } from "react-icons/fa";
 import { IoIosSend } from "react-icons/io";
@@ -14,24 +16,41 @@ interface Props {
 }
 
 const ChatPage = ({ uuid }: Props) => {
-  useEffect(() => {
-    clientCookieManager.set(cookies_keys.CHAT_UUID, uuid, 2);
-    hitMessageApi("Hi").then((res) => {
-      if (!res.success) {
-        notify.error(res.error);
-        return;
-      }
-      setChat((prev) => [
-        {
-          message: res.data.message,
-          user_id: uuid,
-          by: "bot",
-        },
-      ]);
-    });
-  }, []);
-
   const [chats, setChat] = useState<Chat[]>([]);
+
+  const initLoad = () => {
+    const chat = JSON.parse(localStorage.getItem("chats") || "{}");
+    if (chat?.uuid === uuid && chat?.chats.length > 0) {
+      setChat(chat?.chats || []);
+    } else {
+      clientCookieManager.set(cookies_keys.CHAT_UUID, uuid, 2);
+      hitMessageApi("Hi").then((res) => {
+        if (!res.success) {
+          notify.error(res.error);
+          return;
+        }
+        setChat((prev) => [
+          {
+            message: res.data.message,
+            user_id: uuid,
+            by: "bot",
+          },
+        ]);
+      });
+    }
+  };
+
+  useEffect(initLoad, []);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "chats",
+      JSON.stringify({
+        chats,
+        uuid,
+      })
+    );
+  }, [chats]);
 
   const scrollToEnd = () => {
     const chatEnd = document.getElementById("chat-end");
@@ -90,9 +109,43 @@ const ChatPage = ({ uuid }: Props) => {
       });
   };
 
+  const router = useRouter();
+
   return (
     <div className="flex w-screen h-screen">
-      <div className="h-full hidden md:flex  md:w-56 lg:w-72 bg-sidebar"></div>
+      <div className="h-full hidden md:flex flex-col  md:w-56 lg:w-72 bg-sidebar p-4 py-6">
+        <Link href={"/"}>
+          <div className="flex h-fit gap-2 items-center">
+            <FaRobot className="text-3xl text-white" />
+            <h1 className="text-white text-2xl font-bold">Jarvis CC</h1>
+          </div>
+        </Link>
+
+        <div className="mt-4 text-sm text-zinc-300">
+          <p
+            className=">Welcome to Jarvis CC</p>
+          <p className="
+          >
+            Tell me about your interest and I will help you to find a skill best suited for you.
+          </p>
+        </div>
+
+        <div className="mt-8">
+          <Link className="text-white  hover:text-primary " href={"/"}>
+            Home
+          </Link>
+        </div>
+        <div className="mt-4">
+          <div
+            className="text-white  hover:text-primary  cursor-pointer"
+            onClick={() => {
+              router.push(`/jarvis-chat/${Math.random().toString(36).substring(7)}`);
+            }}
+          >
+            New Chat
+          </div>
+        </div>
+      </div>
       <div className="flex flex-col w-full h-full bg-background">
         <div className="flex-1 p-2 overflow-scroll scrollbar-hide ">
           <div>
@@ -146,13 +199,7 @@ const ChatPage = ({ uuid }: Props) => {
                 "cursor-not-allowed": !message,
               })}
             >
-              {loading ? (
-                <div>
-                  <Loader />
-                </div>
-              ) : (
-                <IoIosSend className="group-hover:scale-105 duration-110" />
-              )}
+              {loading ? <Loader /> : <IoIosSend className="group-hover:scale-105 duration-110" />}
             </button>
           </div>
         </div>
