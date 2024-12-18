@@ -115,7 +115,16 @@ def chat():
             goal = user["goal"].lower()
             experience = user["experience"].lower()
 
-           
+            for entry in user["history"]:
+                goal = entry.get("goal", "N/A")
+                experience = entry.get("experience", "N/A")
+                question = entry.get("question", "N/A")
+                answer = entry.get("answer", "N/A")
+                evaluation = entry.get("evaluation", "N/A")
+                conversation = entry.get("guidance", "N/A")
+
+                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\n Guidance: {conversation}\n\n"
+
             guidance_prompt = (
                 f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
                 "Offer recommendations on what skills to focus on, next steps in their career, and resources they can use. "
@@ -127,16 +136,6 @@ def chat():
             guidance = response.text
 
             user["history"].append({"guidance": guidance})
-
-             for entry in user["history"]:
-                goal = entry.get("goal", "N/A")
-                experience = entry.get("experience", "N/A")
-                question = entry.get("question", "N/A")
-                answer = entry.get("answer", "N/A")
-                evaluation = entry.get("evaluation", "N/A")
-                conversation = entry.get("guidance", "N/A")
-
-                conversation_history += f"Question: {question}\nAnswer: {answer}\nEvaluation: {evaluation}\n Guidance: {conversation}\n\n"
 
             if user_message.lower() == "/exit":
                 user_sessions[user_id] = DEFAULT_STATE.copy()
