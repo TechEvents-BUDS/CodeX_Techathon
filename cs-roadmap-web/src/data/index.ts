@@ -97,12 +97,14 @@ export const STATIC_NODES: AppNode[] = [
     name: "Languages and Frameworks",
     description: "Technologies like Node.js, Django, and Spring Boot.",
     nextNodeIds: [],
+    link: ["https://roadmap.sh/nodejs"],
   },
   {
     id: "21",
     name: "Databases and APIs",
     description: "Tools like PostgreSQL, MongoDB, REST, and GraphQL.",
     nextNodeIds: [],
+    link: ["https://roadmap.sh/mongodb"],
   },
 
   // Full-Stack Development
@@ -123,6 +125,7 @@ export const STATIC_NODES: AppNode[] = [
     name: "JAMStack",
     description: "JavaScript, APIs, and Markup.",
     nextNodeIds: [],
+    link: ["https://roadmap.sh/javascript"],
   },
 
   // Game Development
@@ -143,6 +146,7 @@ export const STATIC_NODES: AppNode[] = [
     name: "Game Programming",
     description: "Languages like C# and C++.",
     nextNodeIds: [],
+    link: ["https://roadmap.sh/cpp"],
   },
   {
     id: "32",
