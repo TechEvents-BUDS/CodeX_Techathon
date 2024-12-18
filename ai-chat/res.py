@@ -121,7 +121,7 @@ def chat():
                 evaluation = entry.get("evaluation", "N/A")
                 guidance = entry.get("guidance", "N/A")
 
-                conversation_history += f"Evaluation: {evaluation}\nGuidance: {guidance}\n\n"
+                conversation_history += f"Evaluation: {evaluation}\n"
 
             guidance_prompt = ( 
                 f"Only provide career guidance to a '{experience}' level '{goal}' with respect to their {user_message}. "
